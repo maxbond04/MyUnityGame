@@ -8,13 +8,19 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
       - name: Request manual activation file
         id: getManualLicenseFile
         uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ''
         with:
-          entrypoint: RequestActivation
+          targetPlatform: WebGL
+          versioning: None
+
       - name: Expose as artifact
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: ManualActivationFile
           path: ${{ steps.getManualLicenseFile.outputs.manualActivationFile }}
