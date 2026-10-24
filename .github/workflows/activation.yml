@@ -12,13 +12,13 @@ jobs:
       - name: Request manual activation file
         id: getManualLicenseFile
         uses: game-ci/unity-builder@v4
-        continue-on-error: true
         with:
           targetPlatform: WebGL
+          customParameters: -quit -batchmode -createManualActivationFile
 
       - name: Expose as artifact
         uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: ManualActivationFile
           path: "**/*.alf"
-          if-no-files-found: warn
