@@ -32,11 +32,11 @@ jobs:
         with:
           targetPlatform: WebGL
 
-      - name: Deploy to itch.io
-        uses: JosephBrik/action-butter-itch@v1.1.0
-        with:
-          package: build/WebGL/WebGL
-          user: maxbond04
-          game: myunitygame
-          channel: webgl
-          api-key: ${{ secrets.BUTLER_API_KEY }}
+     - name: Deploy to itch.io
+        uses: manleydev/butler-publish-itchio-action@v1.0.3
+        env:
+          BUTLER_CREDENTIALS: ${{ secrets.BUTLER_API_KEY }}
+          CHANNEL: webgl
+          ITCH_GAME: myunitygame
+          ITCH_USER: maxbond04
+          PACKAGE: build/WebGL/WebGL
