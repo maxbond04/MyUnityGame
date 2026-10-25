@@ -7,23 +7,28 @@ on:
       - master
   workflow_dispatch:
 
+concurrency:
+  group: build-webgl
+  cancel-in-progress: true
+
 jobs:
   build:
-    name: Build WebGL 
+    name: Build WebGL
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Cache Library
         uses: actions/cache@v4
         with:
           path: Library
-          key: Library-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
+          key: Library-WebGL-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
           restore-keys: |
+            Library-WebGL-
             Library-
 
-      - name: Build WebGL
+      - name: Build with GameCI
         uses: game-ci/unity-builder@v4
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
@@ -32,11 +37,37 @@ jobs:
         with:
           targetPlatform: WebGL
 
-     - name: Deploy to itch.io
-        uses: manleydev/butler-publish-itchio-action@v1.0.3
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: build-WebGL
+          path: build/WebGL
+          retention-days: 7
+
+  deploy:
+    name: Push to itch.io
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download build
+        uses: actions/download-artifact@v4
+        with:
+          name: build-WebGL
+          path: build/WebGL
+
+      - name: Check build layout
+        run: ls -R build/WebGL | head -30
+
+      - name: Install butler
+        run: |
+          curl -L -o butler.zip https://broth.itch.zone/butler/linux-amd64/LATEST/archive/default
+          unzip butler.zip
+          chmod +x butler
+          ./butler -V
+
+      - name: Push to itch.io
         env:
-          BUTLER_CREDENTIALS: ${{ secrets.BUTLER_API_KEY }}
-          CHANNEL: webgl
-          ITCH_GAME: myunitygame
-          ITCH_USER: maxbond04
-          PACKAGE: build/WebGL/WebGL
+          BUTLER_API_KEY: ${{ secrets.BUTLER_API_KEY }}
+        run: |
+          ./butler push build/WebGL/WebGL maxbond04/myunitygame:html5 \
+            --userversion "${{ github.run_number }}-${{ github.sha }}"
