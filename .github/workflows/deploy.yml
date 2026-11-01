@@ -19,6 +19,24 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Free disk space
+        uses: jlumbroso/free-disk-space@main
+        with:
+          tool-cache: false
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: false
+
+      - name: Add swap
+        run: |
+          sudo swapoff -a || true
+          sudo fallocate -l 8G /swapfile
+          sudo chmod 600 /swapfile
+          sudo mkswap /swapfile
+          sudo swapon /swapfile
+          free -h
+
       - name: Cache Library
         uses: actions/cache@v4
         with:
@@ -26,7 +44,6 @@ jobs:
           key: Library-WebGL-${{ hashFiles('Assets/**', 'Packages/**', 'ProjectSettings/**') }}
           restore-keys: |
             Library-WebGL-
-            Library-
 
       - name: Build with GameCI
         uses: game-ci/unity-builder@v4
