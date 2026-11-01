@@ -14,7 +14,7 @@ concurrency:
 jobs:
   build:
     name: Build WebGL
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -47,7 +47,7 @@ jobs:
   deploy:
     name: Push to itch.io
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Download build
         uses: actions/download-artifact@v4
