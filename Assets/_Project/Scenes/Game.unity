@@ -131,6 +131,7 @@ GameObject:
   - component: {fileID: 38313658}
   - component: {fileID: 38313657}
   - component: {fileID: 38313656}
+  - component: {fileID: 38313661}
   - component: {fileID: 38313660}
   m_Layer: 0
   m_Name: Player
@@ -228,8 +229,8 @@ Transform:
   m_GameObject: {fileID: 38313655}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.35355, y: 0.24749, z: 0.35355}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalPosition: {x: 0, y: 1, z: 0.35355}
+  m_LocalScale: {x: 1, y: 1.0514, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 330585546}
@@ -250,6 +251,22 @@ MonoBehaviour:
   baseSpeed: 10
   speedIncrease: 0.5
   rampInterval: 10
+--- !u!114 &38313661
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 38313655}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5dc8499dbc484cef9d07f4d036e5f06, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.PlayerLaneMover
+  input: {fileID: 1882352851}
+  laneDistance: 3
+  laneChangeSpeed: 20
+  ignoreInputWhileSnapping: 0
 --- !u!1 &105582904
 GameObject:
   m_ObjectHideFlags: 0
@@ -882,7 +899,7 @@ Transform:
   m_GameObject: {fileID: 1005128418}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.6588001, y: 0.49493, z: 73.650986}
+  m_LocalPosition: {x: 6, y: 0.49493, z: 73.650986}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1106,7 +1123,7 @@ Transform:
   m_GameObject: {fileID: 1207516226}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.6588001, y: 0.49493, z: 13.65099}
+  m_LocalPosition: {x: 6, y: 0.49493, z: 13.65099}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1218,7 +1235,7 @@ Transform:
   m_GameObject: {fileID: 1452980281}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 3.6588001, y: 0.49493, z: 13.65099}
+  m_LocalPosition: {x: -1, y: 0.49493, z: 13.65099}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1457,6 +1474,7 @@ GameObject:
   - component: {fileID: 1882352849}
   - component: {fileID: 1882352848}
   - component: {fileID: 1882352850}
+  - component: {fileID: 1882352851}
   m_Layer: 0
   m_Name: _Systems
   m_TagString: Untagged
@@ -1503,6 +1521,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d43f1055e4d3a45228d9ba979727cb63, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Game.Gameplay::Game.Gameplay.DevAutoStart
+--- !u!114 &1882352851
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1882352847}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1636ef2eac2c44b548f3104dd039ca0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: NewAssembly::Game.Input.LaneInput
 --- !u!1 &1892269112
 GameObject:
   m_ObjectHideFlags: 0
