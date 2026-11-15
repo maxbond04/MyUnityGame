@@ -3,6 +3,7 @@ using Game.Core;
 
 namespace Game.Gameplay
 {
+    // Tracks forward speed (with ramp) and distance. Movement itself is done by PlayerMotor.
     public class PlayerRunner : MonoBehaviour
     {
         [SerializeField] private float baseSpeed = 10f;
@@ -12,15 +13,13 @@ namespace Game.Gameplay
         public float CurrentSpeed { get; private set; }
         public float Distance => transform.position.z - startZ;
 
-        private Vector3 startPosition;
         private float startZ;
         private float survivedTime;
         private bool running;
 
         private void Start()
         {
-            startPosition = transform.position;
-            startZ = startPosition.z;
+            startZ = transform.position.z;
             CurrentSpeed = baseSpeed;
 
             var manager = GameStateManager.Instance;
@@ -36,10 +35,9 @@ namespace Game.Gameplay
 
         private void OnStateChanged(GameState from, GameState to)
         {
-            // New run (not a resume from pause): reset position and timer
+            // New run (not a resume from pause): reset timer and speed
             if (to == GameState.Playing && from != GameState.Paused)
             {
-                transform.position = startPosition;
                 survivedTime = 0f;
                 CurrentSpeed = baseSpeed;
             }
@@ -52,12 +50,11 @@ namespace Game.Gameplay
 
             survivedTime += Time.deltaTime;
             CurrentSpeed = baseSpeed + speedIncrease * Mathf.Floor(survivedTime / rampInterval);
-            transform.Translate(Vector3.forward * (CurrentSpeed * Time.deltaTime), Space.World);
         }
 
+        // TEMPORARY debug HUD, replace with real UI
         private GUIStyle hudStyle;
 
-        // TEMPORARY debug HUD, replace with real UI
         private void OnGUI()
         {
             hudStyle ??= new GUIStyle(GUI.skin.label) { fontSize = 28 };
