@@ -1,5 +1,5 @@
 {
-    "name": "NewAssembly",
+    "name": "Game.Input",
     "rootNamespace": "",
     "references": [
         "GUID:03dcc70ccc02f4200928cd43093384a4",
