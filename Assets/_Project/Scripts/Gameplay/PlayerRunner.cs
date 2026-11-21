@@ -51,16 +51,5 @@ namespace Game.Gameplay
             survivedTime += Time.deltaTime;
             CurrentSpeed = baseSpeed + speedIncrease * Mathf.Floor(survivedTime / rampInterval);
         }
-
-        // TEMPORARY debug HUD, replace with real UI
-        private GUIStyle hudStyle;
-
-        /*private void OnGUI()
-         {
-             hudStyle ??= new GUIStyle(GUI.skin.label) { fontSize = 28 };
-             GUI.Label(new Rect(20, 20, 500, 100),
-                 $"Speed: {CurrentSpeed:F1}\nDistance: {Distance:F0} m", hudStyle);
-         }
-         */
     }
 }

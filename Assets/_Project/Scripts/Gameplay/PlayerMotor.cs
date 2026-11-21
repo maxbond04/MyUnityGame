@@ -59,6 +59,8 @@ namespace Game.Gameplay
             }
         }
 
+        // Launch velocity for a jump of about jumpHeight (the sampled apex 
+        // can be slightly lower at very low frame rates)
         private void OnJumpRequested()
         {
             if (GameStateManager.Instance.Current != GameState.Playing) return;
@@ -77,12 +79,17 @@ namespace Game.Gameplay
 
             if (controller.isGrounded && verticalVelocity < 0f)
                 verticalVelocity = -2f; // keeps the controller pressed to the ground
+
+            // Velocity Verlet: use the average of the old and new velocity so the jump arc
+            // does not depend on the frame rate
+            float previousVelocity = verticalVelocity;
             verticalVelocity += Physics.gravity.y * gravityScale * dt;
+            float verticalStep = (previousVelocity + verticalVelocity) * 0.5f * dt;
 
             Vector3 pos = transform.position;
             float newX = laneMover.StepX(pos.x, dt);
 
-            controller.Move(new Vector3(newX - pos.x, verticalVelocity * dt, runner.CurrentSpeed * dt));
+            controller.Move(new Vector3(newX - pos.x, verticalStep, runner.CurrentSpeed * dt));
         }
     }
 }

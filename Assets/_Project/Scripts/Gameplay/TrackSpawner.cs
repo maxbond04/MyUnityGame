@@ -65,13 +65,15 @@ namespace Game.Gameplay
         {
             if (GameStateManager.Instance.Current != GameState.Playing) return;
 
-            FillAhead(player.position.z);
             RecycleBehind(player.position.z);
+            FillAhead(player.position.z);
+
         }
 
         private void BuildPools()
         {
             pools = new ObjectPool<TrackChunk>[chunkPrefabs.Length];
+            int perPrefab = Mathf.Max(prewarmPerPrefab, RequiredInstancesPerPrefab());
 
             for (int i = 0; i < chunkPrefabs.Length; i++)
             {
@@ -79,25 +81,26 @@ namespace Game.Gameplay
                 ObjectPool<TrackChunk> pool = null;
 
                 pool = new ObjectPool<TrackChunk>(
-                    createFunc: () =>
-                    {
-                        TrackChunk chunk = Instantiate(prefab, chunkParent);
-                        chunk.Pool = pool;
-                        return chunk;
-                    },
-                    actionOnGet: chunk => chunk.gameObject.SetActive(true),
-                    actionOnRelease: chunk => chunk.gameObject.SetActive(false),
-                    actionOnDestroy: chunk => { if (chunk != null) Destroy(chunk.gameObject); },
-                    collectionCheck: true,
-                    defaultCapacity: prewarmPerPrefab + 1,
-                    maxSize: maxPoolSize);
+               createFunc: () =>
+               {
+                   TrackChunk chunk = Instantiate(prefab, chunkParent);
+                   chunk.Pool = pool;
+                   return chunk;
+               },
+               actionOnGet: chunk => chunk.gameObject.SetActive(true),
+               actionOnRelease: chunk => chunk.gameObject.SetActive(false),
+               actionOnDestroy: chunk => { if (chunk != null) Destroy(chunk.gameObject); },
+               collectionCheck: true,
+               defaultCapacity: perPrefab,
+               maxSize: Mathf.Max(maxPoolSize, perPrefab));
 
                 pools[i] = pool;
-                Prewarm(pool, prewarmPerPrefab);
+                Prewarm(pool, perPrefab);
             }
         }
 
-        // Instantiate everything up front (at load), so nothing is created during the run
+        // Instantiate everything up front (at load). The pool is sized for the worst-case number
+        // of simultaneously live chunks, so nothing is created during a run.
         private static void Prewarm(ObjectPool<TrackChunk> pool, int count)
         {
             var temp = new List<TrackChunk>(count);
@@ -142,7 +145,7 @@ namespace Game.Gameplay
             lastIndex = index;
         }
 
-        private int CurrentMaxDifficulty()
+        private int MaxDifficultyForNextChunk()
         {
             if (spawnedCount < safeChunksAtStart) return 0;
 
@@ -150,11 +153,15 @@ namespace Game.Gameplay
             return Mathf.Min(maxDifficulty, 1 + Mathf.FloorToInt(distance / metersPerDifficultyStep));
         }
 
-        // Random pick among chunks not harder than the current level; never the same chunk twice in a row.
+        // Random pick among chunks not harder than the level allowed for the next chunk.
+        // Never the same chunk twice in a row when another eligible chunk exists; repeats are
+        // allowed otherwise (for example the safe empty chunks at the start).
         // Written without lists or LINQ so it creates no garbage.
+        // Uses the start position of the next chunk (up to spawnAheadDistance ahead), 
+        // not the player's current progress.
         private int PickPrefabIndex()
         {
-            int max = CurrentMaxDifficulty();
+            int max = MaxDifficultyForNextChunk();
             int exclude = lastIndex;
 
             int count = CountEligible(max, exclude);
@@ -180,6 +187,21 @@ namespace Game.Gameplay
             for (int i = 0; i < chunkPrefabs.Length; i++)
                 if (i != exclude && chunkPrefabs[i].Difficulty <= max) n++;
             return n;
+        }
+
+        private int RequiredInstancesPerPrefab()
+        {
+            float minLength = float.MaxValue;
+            float maxLength = 0f;
+            for (int i = 0; i < chunkPrefabs.Length; i++)
+            {
+                float length = chunkPrefabs[i].Length;
+                minLength = Mathf.Min(minLength, length);
+                maxLength = Mathf.Max(maxLength, length);
+            }
+
+            float window = despawnBehindDistance + spawnAheadDistance + 2f * maxLength;
+            return Mathf.CeilToInt(window / minLength) + 1;
         }
     }
 }
